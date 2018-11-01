@@ -58,11 +58,10 @@ def update_one_form(id):
         return jsonify({'message': 'form does not exist'}), 404
 
 
-
 @app.route('/<int:id>', methods=['DELETE'])
 def delete_one_form(id):
 
-    if id<0:
+    if id < 0:
         return jsonify({'message': 'invalid id'}), 401
     try:
         form_response_collection.delete_form_by_id(id)
