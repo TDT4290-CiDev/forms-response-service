@@ -1,14 +1,17 @@
-datastore:
-  image: mongo:3.0.2
-  ports:
-    - "27017:27017"
-frontend:
-  build: .
-  command: python -u main.py
-  ports:
-    - "5000:5000"
-  volumes:
-      - .:/src
-  links:
-    - datastore
+version: '3'
+
+services:
+    forms-response-datastore:
+      image: mongo:3.0.2
+      networks:
+          - forms-response
+    forms-response-service:      
+      build: .
+      command: python -u main.py
+      ports:
+        - "5000:8080"
+      networks:
+          - forms-response
+networks:
+    forms-response:
 
