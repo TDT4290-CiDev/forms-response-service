@@ -1,4 +1,3 @@
-from flask import Flask, jsonify, request
 from pymongo import MongoClient
 
 access_url = "forms-response-datastore:27017"
