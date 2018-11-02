@@ -1,4 +1,3 @@
-import os
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
 
@@ -21,7 +20,7 @@ class FormResponseCollection:
         if not form:
             raise ValueError
 
-        del form['_id']
+        form['_id'] = str(form['_id'])
         return form
 
     def get_all_forms(self):
@@ -29,7 +28,9 @@ class FormResponseCollection:
         print(forms)
         result = []
         for form in forms:
+            form['_id'] = str(form['_id'])
             result.append(form)
+
         return result
 
     def add_form(self, form):
@@ -37,15 +38,10 @@ class FormResponseCollection:
         self.form_response_collection.insert_one(form)
         return True
 
-    def update_one_form(self, id, updates): 
-        id = {'id': id}
+    def update_one_form(self, id, updates):
         if not self.form_response_collection.find_one(id):
             raise ValueError
         self.form_response_collection.update_one(id, {'$set': updates})
-        return True
-
-    def delete_one_form(self, name, author):
-        self.form_response_collection.delete_one({'name': name, 'author': author})
         return True
 
     def delete_all_forms(self):
