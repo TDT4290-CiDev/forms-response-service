@@ -45,7 +45,7 @@ class FormResponseCollection:
         self.form_response_collection.delete_many({})
 
     def delete_form_by_id(self, rid):
-        self.form_response_collection.delete_one(ObjectId(rid))
+        self.form_response_collection.delete_one({'_id': ObjectId(rid)})
 
 
 form = FormResponseCollection()
