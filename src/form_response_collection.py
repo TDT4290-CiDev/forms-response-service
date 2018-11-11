@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 access_url = "forms-response-datastore:27017"
 
@@ -15,7 +16,7 @@ class FormResponseCollection:
         self.form_response_collection = self.db.form_response_collection
 
     def get_form_by_id(self, rid):
-        form = self.form_response_collection.find_one({'id': rid})
+        form = self.form_response_collection.find_one(ObjectId(rid))
         if not form:
             raise ValueError
 
@@ -32,23 +33,19 @@ class FormResponseCollection:
         return result
 
     def add_form(self, form):
-
         rid = self.form_response_collection.insert_one(form).inserted_id
         return rid
 
     def update_one_form(self, rid, updates):
-        if not self.form_response_collection.find_one(rid):
+        if not self.form_response_collection.find_one(ObjectId(rid)):
             raise ValueError
-        self.form_response_collection.update_one(rid, {'$set': updates})
+        self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
 
     def delete_all_forms(self):
         self.form_response_collection.delete_many({})
 
     def delete_form_by_id(self, rid):
-        form = self.form_response_collection.find_one({'id': rid})
-        if not form:
-            raise ValueError
-        self.form_response_collection.delete_one({'id': rid})
+        self.form_response_collection.delete_one(ObjectId(rid))
 
 
 form = FormResponseCollection()
