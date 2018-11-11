@@ -27,8 +27,8 @@ def get_one_form(rid):
 @app.route('/', methods=['POST'])
 def add_form():
     form = request.get_json()
-    form_response_collection.add_form(form)
-    return 'Successfully inserted document', HTTPStatus.CREATED
+    rid = form_response_collection.add_form(form)
+    return rid, HTTPStatus.CREATED
 
 
 @app.route('/<rid>', methods=['PUT'])
