@@ -14,9 +14,9 @@ def get_all_forms():
 
 
 @app.route('/<id>', methods=['GET'])
-def get_one_form(id):
+def get_one_form(rid):
     try:
-        form = form_response_collection.get_form_by_id(id)
+        form = form_response_collection.get_form_by_id(rid)
         return jsonify({'data': form})
 
     except ValueError:
@@ -34,20 +34,20 @@ def add_form():
         return 'Credentials not provied', 401
 
 
-@app.route('/<id>', methods=['PUT'])
-def update_one_form(id):
+@app.route('/<rid>', methods=['PUT'])
+def update_one_form(rid):
     try:
         updates = request.get_json()
-        form_response_collection.update_one_form(id, updates)
+        form_response_collection.update_one_form(rid, updates)
 
     except ValueError:
         return 'Form does not exist', 404
 
 
-@app.route('/<id>', methods=['DELETE'])
-def delete_one_form(id):
+@app.route('/<rid>', methods=['DELETE'])
+def delete_one_form(rid):
     try:
-        form_response_collection.delete_form_by_id(id)
+        form_response_collection.delete_form_by_id(rid)
 
         return 'Form successfully deleted', 200
     except ValueError:

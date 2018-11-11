@@ -14,8 +14,8 @@ class FormResponseCollection:
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
 
-    def get_form_by_id(self, id):
-        form = self.form_response_collection.find_one({'id': id})
+    def get_form_by_id(self, rid):
+        form = self.form_response_collection.find_one({'id': rid})
         if not form:
             raise ValueError
 
@@ -24,7 +24,6 @@ class FormResponseCollection:
 
     def get_all_forms(self):
         forms = self.form_response_collection.find({})
-        print(forms)
         result = []
         for form in forms:
             form['_id'] = str(form['_id'])
@@ -34,25 +33,22 @@ class FormResponseCollection:
 
     def add_form(self, form):
 
-        self.form_response_collection.insert_one(form)
-        return True
+        rid = self.form_response_collection.insert_one(form).inserted_id
+        return rid
 
-    def update_one_form(self, id, updates):
-        if not self.form_response_collection.find_one(id):
+    def update_one_form(self, rid, updates):
+        if not self.form_response_collection.find_one(rid):
             raise ValueError
-        self.form_response_collection.update_one(id, {'$set': updates})
-        return True
+        self.form_response_collection.update_one(rid, {'$set': updates})
 
     def delete_all_forms(self):
         self.form_response_collection.delete_many({})
-        return True
 
-    def delete_form_by_id(self, id):
-        form = self.form_response_collection.find_one({'id': id})
+    def delete_form_by_id(self, rid):
+        form = self.form_response_collection.find_one({'id': rid})
         if not form:
             raise ValueError
-        self.form_response_collection.delete_one({'id': id})
-        return True
+        self.form_response_collection.delete_one({'id': rid})
 
 
 form = FormResponseCollection()
