@@ -34,7 +34,7 @@ class FormResponseCollection:
 
     def add_form(self, form):
         rid = self.form_response_collection.insert_one(form).inserted_id
-        return rid
+        return str(rid)
 
     def update_one_form(self, rid, updates):
         if not self.form_response_collection.find_one(ObjectId(rid)):
