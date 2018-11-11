@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from form_response_collection import FormResponseCollection
+from http import HTTPStatus
 
 
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def get_one_form(rid):
         return jsonify({'data': form})
 
     except ValueError:
-        return 'Form does not exist', 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
 @app.route('/', methods=['POST'])
@@ -28,10 +29,10 @@ def add_form():
     try:
         form = request.get_json()
         form_response_collection.add_form(form)
-        return 'Successfully inserted document', 201
+        return 'Successfully inserted document', HTTPStatus.CREATED
 
     except ValueError:
-        return 'Credentials not provied', 401
+        return 'Credentials not provied', HTTPStatus.UNAUTHORIZED
 
 
 @app.route('/<rid>', methods=['PUT'])
@@ -41,7 +42,7 @@ def update_one_form(rid):
         form_response_collection.update_one_form(rid, updates)
 
     except ValueError:
-        return 'Form does not exist', 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
 @app.route('/<rid>', methods=['DELETE'])
@@ -49,9 +50,9 @@ def delete_one_form(rid):
     try:
         form_response_collection.delete_form_by_id(rid)
 
-        return 'Form successfully deleted', 200
+        return 'Form successfully deleted', HTTPStatus.OK
     except ValueError:
-        return 'Form does not exist', 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
 if __name__ == '__main__':
