@@ -26,13 +26,9 @@ def get_one_form(rid):
 
 @app.route('/', methods=['POST'])
 def add_form():
-    try:
-        form = request.get_json()
-        form_response_collection.add_form(form)
-        return 'Successfully inserted document', HTTPStatus.CREATED
-
-    except ValueError:
-        return 'Credentials not provied', HTTPStatus.UNAUTHORIZED
+    form = request.get_json()
+    form_response_collection.add_form(form)
+    return 'Successfully inserted document', HTTPStatus.CREATED
 
 
 @app.route('/<rid>', methods=['PUT'])
