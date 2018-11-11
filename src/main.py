@@ -14,7 +14,7 @@ def get_all_forms():
     return jsonify({'data': forms})
 
 
-@app.route('/<id>', methods=['GET'])
+@app.route('/<rid>', methods=['GET'])
 def get_one_form(rid):
     try:
         form = form_response_collection.get_form_by_id(rid)
@@ -52,9 +52,4 @@ def delete_one_form(rid):
 
 
 if __name__ == '__main__':
-
     app.run(debug=True, host='0.0.0.0', port=8080)
-
-
-
-
