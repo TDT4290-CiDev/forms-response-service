@@ -14,7 +14,7 @@ class FormResponseCollection:
         self.client = MongoClient(access_url)
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
-        self.form_response_collection.create_index('workflows', name='workflows-index')
+        self.form_response_collection.create_index('form', name='form-index')
 
     def get_response_by_id(self, rid):
         form = self.form_response_collection.find_one(ObjectId(rid))
