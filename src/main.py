@@ -2,9 +2,13 @@ from flask import Flask, jsonify, request
 from form_response_collection import FormResponseCollection
 from http import HTTPStatus
 
+import requests
+
 
 app = Flask(__name__)
 form_response_collection = FormResponseCollection()
+form_editor_url = 'http://form-editor-service:8080/'
+case_executor_url = 'http://case-executor-service:8080/'
 
 
 @app.route('/', methods=['GET'])
@@ -29,7 +33,18 @@ def get_one_response(rid):
 
 @app.route('/<form_id>', methods=['POST'])
 def add_response(form_id):
+    form_request = requests.get(form_editor_url + form_id)
+
+    if form_request.status_code == 404:
+        return 'No form with id {} exists'.format(form_id), HTTPStatus.BAD_REQUEST
+
+    form = form_request.json()
     response = request.get_json()
+
+    if 'workflows' in form:
+        for flow in form['workflows']:
+            requests.post(case_executor_url + 'execute_workflow/' + flow, json=response)
+
     rid = form_response_collection.add_response(response, form_id)
     return rid, HTTPStatus.CREATED
 
