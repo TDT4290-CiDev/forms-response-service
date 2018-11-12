@@ -14,7 +14,7 @@ class FormResponseCollection:
         self.client = MongoClient(access_url)
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
-        self.form_response_collection.create_index('form', name='form-index')
+        self.form_response_collection.create_index('_form', name='form-index')
 
     def get_response_by_id(self, rid):
         response = self.form_response_collection.find_one(ObjectId(rid))
@@ -34,7 +34,7 @@ class FormResponseCollection:
         return result
 
     def get_responses_to_form(self, form_id):
-        responses = self.form_response_collection.find({'form': form_id})
+        responses = self.form_response_collection.find({'_form': form_id})
         result = []
         for response in responses:
             response['_id'] = str(response['_id'])
@@ -43,7 +43,7 @@ class FormResponseCollection:
         return result
 
     def add_response(self, response, form_id):
-        response['form'] = form_id
+        response['_form'] = form_id
         rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
 
