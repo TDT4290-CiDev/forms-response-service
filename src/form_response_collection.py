@@ -17,19 +17,19 @@ class FormResponseCollection:
         self.form_response_collection.create_index('form', name='form-index')
 
     def get_response_by_id(self, rid):
-        form = self.form_response_collection.find_one(ObjectId(rid))
-        if not form:
+        response = self.form_response_collection.find_one(ObjectId(rid))
+        if not response:
             raise ValueError
 
-        form['_id'] = str(form['_id'])
-        return form
+        response['_id'] = str(response['_id'])
+        return response
 
     def get_all_responses(self):
-        forms = self.form_response_collection.find({})
+        responses = self.form_response_collection.find({})
         result = []
-        for form in forms:
-            form['_id'] = str(form['_id'])
-            result.append(form)
+        for response in responses:
+            response['_id'] = str(response['_id'])
+            result.append(response)
 
         return result
 
