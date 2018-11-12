@@ -9,33 +9,33 @@ form_response_collection = FormResponseCollection()
 
 @app.route('/', methods=['GET'])
 @app.route('/<form_id>')
-def get_all_forms(form_id=None):
+def get_all_responses(form_id=None):
     if form_id is None:
-        forms = form_response_collection.get_all_responses()
+        responses = form_response_collection.get_all_responses()
     else:
-        forms = form_response_collection.get_responses_to_form(form_id)
-    return jsonify({'data': forms})
+        responses = form_response_collection.get_responses_to_form(form_id)
+    return jsonify({'data': responses})
 
 
 @app.route('/<rid>', methods=['GET'])
-def get_one_form(rid):
+def get_one_response(rid):
     try:
-        form = form_response_collection.get_response_by_id(rid)
-        return jsonify({'data': form})
+        response = form_response_collection.get_response_by_id(rid)
+        return jsonify({'data': response})
 
     except ValueError:
         return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
 @app.route('/', methods=['POST'])
-def add_form():
-    form = request.get_json()
-    rid = form_response_collection.add_response(form)
+def add_response():
+    response = request.get_json()
+    rid = form_response_collection.add_response(response)
     return rid, HTTPStatus.CREATED
 
 
 @app.route('/<rid>', methods=['PUT'])
-def update_one_form(rid):
+def update_one_response(rid):
     try:
         updates = request.get_json()
         form_response_collection.update_one_response(rid, updates)
@@ -45,7 +45,7 @@ def update_one_form(rid):
 
 
 @app.route('/<rid>', methods=['DELETE'])
-def delete_one_form(rid):
+def delete_one_response(rid):
     try:
         form_response_collection.delete_response_by_id(rid)
 
