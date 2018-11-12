@@ -33,7 +33,8 @@ class FormResponseCollection:
 
         return result
 
-    def add_response(self, response):
+    def add_response(self, response, form_id):
+        response['form'] = form_id
         rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
 
