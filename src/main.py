@@ -27,10 +27,10 @@ def get_one_response(rid):
         return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
-@app.route('/', methods=['POST'])
-def add_response():
+@app.route('/<form_id>', methods=['POST'])
+def add_response(form_id):
     response = request.get_json()
-    rid = form_response_collection.add_response(response)
+    rid = form_response_collection.add_response(response, form_id)
     return rid, HTTPStatus.CREATED
 
 
