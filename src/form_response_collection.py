@@ -16,7 +16,7 @@ class FormResponseCollection:
         self.form_response_collection = self.db.form_response_collection
         self.form_response_collection.create_index('workflows', name='workflows-index')
 
-    def get_form_by_id(self, rid):
+    def get_response_by_id(self, rid):
         form = self.form_response_collection.find_one(ObjectId(rid))
         if not form:
             raise ValueError
@@ -24,7 +24,7 @@ class FormResponseCollection:
         form['_id'] = str(form['_id'])
         return form
 
-    def get_all_forms(self):
+    def get_all_responses(self):
         forms = self.form_response_collection.find({})
         result = []
         for form in forms:
@@ -33,19 +33,19 @@ class FormResponseCollection:
 
         return result
 
-    def add_form(self, form):
-        rid = self.form_response_collection.insert_one(form).inserted_id
+    def add_response(self, response):
+        rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
 
-    def update_one_form(self, rid, updates):
+    def update_one_response(self, rid, updates):
         if not self.form_response_collection.find_one(ObjectId(rid)):
             raise ValueError
         self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
 
-    def delete_all_forms(self):
+    def delete_all_responses(self):
         self.form_response_collection.delete_many({})
 
-    def delete_form_by_id(self, rid):
+    def delete_response_by_id(self, rid):
         self.form_response_collection.delete_one({'_id': ObjectId(rid)})
 
 
