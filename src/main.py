@@ -7,7 +7,7 @@ import requests
 
 app = Flask(__name__)
 form_response_collection = FormResponseCollection()
-form_editor_url = 'http://form-editor-service:8080/'
+form_editor_url = 'http://forms-editor-service:8080/'
 case_executor_url = 'http://case-executor-service:8080/'
 
 
@@ -38,7 +38,7 @@ def add_response(form_id):
     if form_request.status_code == 404:
         return 'No form with id {} exists'.format(form_id), HTTPStatus.BAD_REQUEST
 
-    form = form_request.json()
+    form = form_request.json()['data']
     response = request.get_json()
 
     if 'workflows' in form:
