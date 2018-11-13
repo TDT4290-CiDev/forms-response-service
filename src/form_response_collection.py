@@ -29,7 +29,7 @@ class FormResponseCollection:
     def get_response_by_id(self, rid):
         response = self.form_response_collection.find_one(ObjectId(rid))
         if not response:
-            raise ValueError
+            raise ValueError(f'Form response with id {rid} does not exist.')
 
         response['_id'] = str(response['_id'])
         return response
@@ -61,13 +61,15 @@ class FormResponseCollection:
 
     @catch_invalid_id
     def update_one_response(self, rid, updates):
-        if not self.form_response_collection.find_one(ObjectId(rid)):
-            raise ValueError
-        self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
+        update_res = self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
+        if update_res.matched_count == 0:
+            raise ValueError(f'Form response with id {rid} does not exist.')
 
     def delete_all_responses(self):
         self.form_response_collection.delete_many({})
 
     @catch_invalid_id
     def delete_response_by_id(self, rid):
-        self.form_response_collection.delete_one({'_id': ObjectId(rid)})
+        delete_res = self.form_response_collection.delete_one({'_id': ObjectId(rid)})
+        if delete_res.deleted_count == 0:
+            raise ValueError(f'Form response with id {rid} does not exist.')
