@@ -1,7 +1,16 @@
 from pymongo import MongoClient
-from bson.objectid import ObjectId
+from bson.objectid import ObjectId, InvalidId
 
 access_url = "forms-response-datastore:27017"
+
+
+def catch_invalid_id(form_operator):
+    def catch_wrapper(*args):
+        try:
+            return form_operator(*args)
+        except InvalidId:
+            raise ValueError('{} is not a valid ID. '.format(args[1]))
+    return catch_wrapper
 
 
 class FormResponseCollection:
@@ -16,6 +25,7 @@ class FormResponseCollection:
         self.form_response_collection = self.db.form_response_collection
         self.form_response_collection.create_index('form', name='form-index')
 
+    @catch_invalid_id
     def get_response_by_id(self, rid):
         response = self.form_response_collection.find_one(ObjectId(rid))
         if not response:
@@ -33,8 +43,9 @@ class FormResponseCollection:
 
         return result
 
+    @catch_invalid_id
     def get_responses_to_form(self, form_id):
-        responses = self.form_response_collection.find({'form': form_id})
+        responses = self.form_response_collection.find({'form': ObjectId(form_id)})
         result = []
         for response in responses:
             response['_id'] = str(response['_id'])
@@ -42,11 +53,13 @@ class FormResponseCollection:
 
         return result
 
+    @catch_invalid_id
     def add_response(self, response, form_id):
-        response['form'] = form_id
+        response['form'] = ObjectId(form_id)
         rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
 
+    @catch_invalid_id
     def update_one_response(self, rid, updates):
         if not self.form_response_collection.find_one(ObjectId(rid)):
             raise ValueError
@@ -55,5 +68,6 @@ class FormResponseCollection:
     def delete_all_responses(self):
         self.form_response_collection.delete_many({})
 
+    @catch_invalid_id
     def delete_response_by_id(self, rid):
         self.form_response_collection.delete_one({'_id': ObjectId(rid)})
