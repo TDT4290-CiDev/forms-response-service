@@ -21,7 +21,7 @@ class FormResponseCollection:
         self.client = client
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
-        self.form_response_collection.create_index('form', name='form-index')
+        self.form_response_collection.create_index('_form', name='form-index')
 
     @catch_invalid_id
     def get_response_by_id(self, rid):
@@ -43,7 +43,7 @@ class FormResponseCollection:
 
     @catch_invalid_id
     def get_responses_to_form(self, form_id):
-        responses = self.form_response_collection.find({'form': ObjectId(form_id)})
+        responses = self.form_response_collection.find({'_form': ObjectId(form_id)})
         result = []
         for response in responses:
             response['_id'] = str(response['_id'])
@@ -53,7 +53,7 @@ class FormResponseCollection:
 
     @catch_invalid_id
     def add_response(self, form_id, response):
-        response['form'] = ObjectId(form_id)
+        response['_form'] = ObjectId(form_id)
         rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
 

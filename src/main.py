@@ -4,12 +4,17 @@ from pymongo import MongoClient
 
 from form_response_collection import FormResponseCollection
 
+import requests
+
 
 app = Flask(__name__)
 
 access_url = "forms-response-datastore:27017"
 
 form_response_collection = FormResponseCollection(MongoClient(access_url))
+
+form_editor_url = 'http://forms-editor-service:8080/'
+case_executor_url = 'http://case-executor-service:8080/'
 
 
 @app.route('/', methods=['GET'])
@@ -34,7 +39,18 @@ def get_one_response(rid):
 
 @app.route('/<form_id>', methods=['POST'])
 def add_response(form_id):
+    form_request = requests.get(form_editor_url + form_id)
+
+    if form_request.status_code == HTTPStatus.NOT_FOUND:
+        return 'No form with id {} exists'.format(form_id), HTTPStatus.BAD_REQUEST
+
+    form = form_request.json()['data']
     response = request.get_json()
+
+    if 'workflows' in form:
+        for flow in form['workflows']:
+            requests.post(case_executor_url + 'execute_workflow/' + flow, json=response)
+
     rid = form_response_collection.add_response(form_id, response)
     return rid, HTTPStatus.CREATED
 
