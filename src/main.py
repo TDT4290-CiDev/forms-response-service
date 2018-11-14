@@ -45,7 +45,7 @@ def add_response(form_id):
         for flow in form['workflows']:
             requests.post(case_executor_url + 'execute_workflow/' + flow, json=response)
 
-    rid = form_response_collection.add_response(response, form_id)
+    rid = form_response_collection.add_response(form_id, response)
     return rid, HTTPStatus.CREATED
 
 
