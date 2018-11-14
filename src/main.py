@@ -1,63 +1,58 @@
 from flask import Flask, jsonify, request
 from form_response_collection import FormResponseCollection
+from http import HTTPStatus
 
 
 app = Flask(__name__)
-
 form_response_collection = FormResponseCollection()
 
 
 @app.route('/', methods=['GET'])
-def get_all_forms():
-    forms = form_response_collection.get_all_forms()
-    return jsonify({'all_forms': forms})
+@app.route('/<form_id>')
+def get_all_responses(form_id=None):
+    if form_id is None:
+        responses = form_response_collection.get_all_responses()
+    else:
+        responses = form_response_collection.get_responses_to_form(form_id)
+    return jsonify({'data': responses})
 
 
-@app.route('/<id>', methods=['GET'])
-def get_one_form(id):
+@app.route('/<rid>', methods=['GET'])
+def get_one_response(rid):
     try:
-        form = form_response_collection.get_form_by_id(id)
-        return jsonify({'form': form})
+        response = form_response_collection.get_response_by_id(rid)
+        return jsonify({'data': response})
 
     except ValueError:
-        return jsonify({'message': 'form does not exist'}), 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
-@app.route('/', methods=['POST'])
-def add_form():
-    try:
-        form = request.get_json()
-        form_response_collection.add_form(form)
-        return jsonify({'message': 'Successfully inserted document'}), 201
-
-    except ValueError:
-        return jsonify({'message': 'Credentials not provied'}), 401
+@app.route('/<form_id>', methods=['POST'])
+def add_response(form_id):
+    response = request.get_json()
+    rid = form_response_collection.add_response(form_id, response)
+    return rid, HTTPStatus.CREATED
 
 
-@app.route('/<id>', methods=['PUT'])
-def update_one_form(id):
+@app.route('/<rid>', methods=['PUT'])
+def update_one_response(rid):
     try:
         updates = request.get_json()
-        form_response_collection.update_one_form(id, updates)
+        form_response_collection.update_one_response(rid, updates)
 
     except ValueError:
-        return jsonify({'message': 'form does not exist'}), 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
-@app.route('/<id>', methods=['DELETE'])
-def delete_one_form(id):
+@app.route('/<rid>', methods=['DELETE'])
+def delete_one_response(rid):
     try:
-        form_response_collection.delete_form_by_id(id)
+        form_response_collection.delete_response_by_id(rid)
 
-        return jsonify({'message': 'form successfully deleted'}), 200
+        return 'Form successfully deleted', HTTPStatus.OK
     except ValueError:
-        return jsonify({'message': 'form does not exist'}), 404
+        return 'Form does not exist', HTTPStatus.NOT_FOUND
 
 
 if __name__ == '__main__':
-
     app.run(debug=True, host='0.0.0.0', port=8080)
-
-
-
-
