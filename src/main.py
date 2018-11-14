@@ -35,7 +35,7 @@ def get_one_response(rid):
 def add_response(form_id):
     form_request = requests.get(form_editor_url + form_id)
 
-    if form_request.status_code == 404:
+    if form_request.status_code == HTTPStatus.NOT_FOUND:
         return 'No form with id {} exists'.format(form_id), HTTPStatus.BAD_REQUEST
 
     form = form_request.json()['data']
