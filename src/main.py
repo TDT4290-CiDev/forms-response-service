@@ -30,7 +30,7 @@ def get_one_response(rid):
 @app.route('/<form_id>', methods=['POST'])
 def add_response(form_id):
     response = request.get_json()
-    rid = form_response_collection.add_response(response, form_id)
+    rid = form_response_collection.add_response(form_id, response)
     return rid, HTTPStatus.CREATED
 
 

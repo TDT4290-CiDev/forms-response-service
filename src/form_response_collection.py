@@ -54,7 +54,7 @@ class FormResponseCollection:
         return result
 
     @catch_invalid_id
-    def add_response(self, response, form_id):
+    def add_response(self, form_id, response):
         response['form'] = ObjectId(form_id)
         rid = self.form_response_collection.insert_one(response).inserted_id
         return str(rid)
