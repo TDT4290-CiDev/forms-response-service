@@ -32,6 +32,7 @@ class FormResponseCollection:
             raise ValueError(f'Form response with id {rid} does not exist.')
 
         response['_id'] = str(response['_id'])
+        response['_form'] = str(response['_form'])
         return response
 
     def get_all_responses(self):
@@ -39,6 +40,7 @@ class FormResponseCollection:
         result = []
         for response in responses:
             response['_id'] = str(response['_id'])
+            response['_form'] = str(response['_form'])
             result.append(response)
 
         return result
@@ -49,6 +51,7 @@ class FormResponseCollection:
         result = []
         for response in responses:
             response['_id'] = str(response['_id'])
+            response['_form'] = str(response['_form'])
             result.append(response)
 
         return result
