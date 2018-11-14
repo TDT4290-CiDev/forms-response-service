@@ -1,5 +1,7 @@
+from pymongo import MongoClient
 from bson.objectid import ObjectId, InvalidId
 
+access_url = "forms-response-datastore:27017"
 
 
 def catch_invalid_id(form_operator):
@@ -17,8 +19,8 @@ class FormResponseCollection:
     db = None
     form_response_collection = None
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
+        self.client = MongoClient(access_url)
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
         self.form_response_collection.create_index('form', name='form-index')
@@ -59,7 +61,7 @@ class FormResponseCollection:
 
     @catch_invalid_id
     def update_one_response(self, rid, updates):
-        update_res = self.form_response_collection.update_one({'_id': ObjectId(rid)}, {'$set': updates})
+        update_res = self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
         if update_res.matched_count == 0:
             raise ValueError(f'Form response with id {rid} does not exist.')
 
