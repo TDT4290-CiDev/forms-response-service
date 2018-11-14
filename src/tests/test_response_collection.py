@@ -10,15 +10,16 @@ class CollectionTest(unittest.TestCase):
     initial_responses = None
 
     def setUp(self):
-        self.example_form_id = str(ObjectId())
         self.mock_coll = FormResponseCollection(mongomock.MongoClient())
-        self.initial_responses = [dict(title='response1', form='1'), dict(title='response2', form='2')]
+        self.form_id_not_in_db = ObjectId()
+        self.form_id_in_db = ObjectId()
+        self.initial_responses = [dict(title='response1', _form=self.form_id_in_db), dict(title='response2', _form='2')]
         for f in self.initial_responses:
             f['_id'] = str(self.mock_coll.db.form_response_collection.insert_one(f).inserted_id)
 
     def test_add_return_valid_id(self):
-        add_response = self.mock_coll.add_response(self.example_form_id, {"title": "test"})
-        self.assertTrue(ObjectId.is_valid(add_response))
+        response_id = self.mock_coll.add_response(str(self.form_id_not_in_db), {"title": "test"})
+        self.assertTrue(ObjectId.is_valid(response_id))
 
     def test_read_one(self):
         _id = self.initial_responses[0]['_id']
@@ -28,6 +29,10 @@ class CollectionTest(unittest.TestCase):
     def test_read_all(self):
         all = self.mock_coll.get_all_responses()
         self.assertEqual(all, self.initial_responses)
+
+    def test_read_all_by_form(self):
+        res = self.mock_coll.get_responses_to_form(str(self.form_id_in_db))
+        self.assertEqual(res, [r for r in self.initial_responses if r['_form'] == self.form_id_in_db])
 
     def test_update_no_return(self):
         _id = self.initial_responses[0]['_id']
@@ -49,11 +54,10 @@ class CollectionTest(unittest.TestCase):
             self.mock_coll.delete_response_by_id(inv_id)
 
     def test_valid_but_nonexisting_id(self):
-        # Creating an id of correct length, but with all 5s.
-        inv_id = self.example_form_id
+        nonexisting_id = str(self.form_id_not_in_db)
         with self.assertRaises(ValueError):
-            self.mock_coll.get_response_by_id(inv_id)
+            self.mock_coll.get_response_by_id(nonexisting_id)
         with self.assertRaises(ValueError):
-            self.mock_coll.update_one_response(inv_id, {})
+            self.mock_coll.update_one_response(nonexisting_id, {})
         with self.assertRaises(ValueError):
-            self.mock_coll.delete_response_by_id(inv_id)
+            self.mock_coll.delete_response_by_id(nonexisting_id)
