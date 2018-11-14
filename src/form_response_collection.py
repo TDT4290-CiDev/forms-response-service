@@ -61,7 +61,7 @@ class FormResponseCollection:
 
     @catch_invalid_id
     def update_one_response(self, rid, updates):
-        update_res = self.form_response_collection.update_one(ObjectId(rid), {'$set': updates})
+        update_res = self.form_response_collection.update_one({'_id': ObjectId(rid)}, {'$set': updates})
         if update_res.matched_count == 0:
             raise ValueError(f'Form response with id {rid} does not exist.')
 
