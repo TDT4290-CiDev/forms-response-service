@@ -2,9 +2,13 @@ from flask import Flask, jsonify, request
 from form_response_collection import FormResponseCollection
 from http import HTTPStatus
 
+import requests
+
 
 app = Flask(__name__)
 form_response_collection = FormResponseCollection()
+form_editor_url = 'http://forms-editor-service:8080/'
+case_executor_url = 'http://case-executor-service:8080/'
 
 
 @app.route('/', methods=['GET'])
@@ -30,15 +34,29 @@ def get_one_response(rid):
         response = form_response_collection.get_response_by_id(rid)
         return jsonify({'data': response})
 
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<form_id>', methods=['POST'])
 def add_response(form_id):
+    form_request = requests.get(form_editor_url + form_id)
+
+    if form_request.status_code == HTTPStatus.NOT_FOUND:
+        return 'No form with id {} exists'.format(form_id), HTTPStatus.BAD_REQUEST
+
+    form = form_request.json()['data']
     response = request.get_json()
-    rid = form_response_collection.add_response(form_id, response)
-    return rid, HTTPStatus.CREATED
+
+    if 'workflows' in form:
+        for flow in form['workflows']:
+            requests.post(case_executor_url + 'execute_workflow/' + flow, json=response)
+
+    try:
+        rid = form_response_collection.add_response(form_id, response)
+        return rid, HTTPStatus.CREATED
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<rid>', methods=['PUT'])
@@ -46,9 +64,10 @@ def update_one_response(rid):
     try:
         updates = request.get_json()
         form_response_collection.update_one_response(rid, updates)
+        return '', HTTPStatus.NO_CONTENT
 
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<rid>', methods=['DELETE'])
@@ -56,9 +75,9 @@ def delete_one_response(rid):
     try:
         form_response_collection.delete_response_by_id(rid)
 
-        return 'Form successfully deleted', HTTPStatus.OK
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+        return '', HTTPStatus.NO_CONTENT
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 if __name__ == '__main__':
