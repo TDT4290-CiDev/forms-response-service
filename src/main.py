@@ -17,7 +17,10 @@ def get_all_responses():
     if form_id is None:
         responses = form_response_collection.get_all_responses()
     else:
-        responses = form_response_collection.get_responses_to_form(form_id)
+        try:
+            responses = form_response_collection.get_responses_to_form(form_id)
+        except ValueError as e:
+            return str(e), HTTPStatus.BAD_REQUEST
     return jsonify({'data': responses})
 
 
