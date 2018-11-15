@@ -17,7 +17,10 @@ def get_all_responses(form_id=None):
     if form_id is None:
         responses = form_response_collection.get_all_responses()
     else:
-        responses = form_response_collection.get_responses_to_form(form_id)
+        try:
+            responses = form_response_collection.get_responses_to_form(form_id)
+        except ValueError as e:
+            return str(e), HTTPStatus.NOT_FOUND
     return jsonify({'data': responses})
 
 
@@ -27,8 +30,8 @@ def get_one_response(rid):
         response = form_response_collection.get_response_by_id(rid)
         return jsonify({'data': response})
 
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<form_id>', methods=['POST'])
@@ -45,8 +48,11 @@ def add_response(form_id):
         for flow in form['workflows']:
             requests.post(case_executor_url + 'execute_workflow/' + flow, json=response)
 
-    rid = form_response_collection.add_response(form_id, response)
-    return rid, HTTPStatus.CREATED
+    try:
+        rid = form_response_collection.add_response(form_id, response)
+        return rid, HTTPStatus.CREATED
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<rid>', methods=['PUT'])
@@ -54,9 +60,10 @@ def update_one_response(rid):
     try:
         updates = request.get_json()
         form_response_collection.update_one_response(rid, updates)
+        return '', HTTPStatus.NO_CONTENT
 
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 @app.route('/<rid>', methods=['DELETE'])
@@ -64,9 +71,9 @@ def delete_one_response(rid):
     try:
         form_response_collection.delete_response_by_id(rid)
 
-        return 'Form successfully deleted', HTTPStatus.OK
-    except ValueError:
-        return 'Form does not exist', HTTPStatus.NOT_FOUND
+        return '', HTTPStatus.NO_CONTENT
+    except ValueError as e:
+        return str(e), HTTPStatus.NOT_FOUND
 
 
 if __name__ == '__main__':
