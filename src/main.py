@@ -8,8 +8,12 @@ form_response_collection = FormResponseCollection()
 
 
 @app.route('/', methods=['GET'])
-@app.route('/<form_id>')
-def get_all_responses(form_id=None):
+def get_all_responses():
+    body = request.json()
+    form_id = None
+    if body and 'form' in body:
+        form_id = body['form']
+
     if form_id is None:
         responses = form_response_collection.get_all_responses()
     else:
