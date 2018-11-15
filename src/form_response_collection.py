@@ -1,7 +1,5 @@
-from pymongo import MongoClient
 from bson.objectid import ObjectId, InvalidId
 
-access_url = "forms-response-datastore:27017"
 
 
 def catch_invalid_id(form_operator):
@@ -19,8 +17,8 @@ class FormResponseCollection:
     db = None
     form_response_collection = None
 
-    def __init__(self):
-        self.client = MongoClient(access_url)
+    def __init__(self, client):
+        self.client = client
         self.db = self.client.cidev_db
         self.form_response_collection = self.db.form_response_collection
         self.form_response_collection.create_index('_form', name='form-index')
