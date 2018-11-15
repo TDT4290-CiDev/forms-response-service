@@ -12,19 +12,15 @@ case_executor_url = 'http://case-executor-service:8080/'
 
 
 @app.route('/', methods=['GET'])
-def get_all_responses():
-    body = request.json()
-    form_id = None
-    if body and 'form' in body:
-        form_id = body['form']
-
+@app.route('/<form_id>')
+def get_all_responses(form_id=None):
     if form_id is None:
         responses = form_response_collection.get_all_responses()
     else:
         try:
             responses = form_response_collection.get_responses_to_form(form_id)
         except ValueError as e:
-            return str(e), HTTPStatus.BAD_REQUEST
+            return str(e), HTTPStatus.NOT_FOUND
     return jsonify({'data': responses})
 
 
